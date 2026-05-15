@@ -1,118 +1,86 @@
-const express = require("express");
-const router = express.Router();
+const express = require('express')
 
-const Resume = require("../models/Resume");
+const router = express.Router()
 
+const Resume = require('../models/Resume')
 
-// ===============================
-// GET ALL RESUMES
-// GET /api/resume
-// ===============================
-router.get("/", async (req, res) => {
-  try {
-    const resumes = await Resume.find().sort({ createdAt: -1 });
+router.post('/create', async (req, res) => {
 
-    res.status(200).json({
-      success: true,
-      count: resumes.length,
-      data: resumes,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch resumes",
-      error: error.message,
-    });
-  }
-});
+    try {
 
+        const resume = await Resume.create(req.body)
 
-// ===============================
-// CREATE RESUME
-// POST /api/resume
-// ===============================
-router.post("/", async (req, res) => {
-  try {
-    const newResume = await Resume.create(req.body);
+        res.json(resume)
 
-    res.status(201).json({
-      success: true,
-      message: "Resume created successfully",
-      data: newResume,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to create resume",
-      error: error.message,
-    });
-  }
-});
+    } catch (error) {
 
+        res.status(500).json({
+            message: 'Resume Creation Failed'
+        })
 
-// ===============================
-// UPDATE RESUME
-// PUT /api/resume/:id
-// ===============================
-router.put("/:id", async (req, res) => {
-  try {
-    const updatedResume = await Resume.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!updatedResume) {
-      return res.status(404).json({
-        success: false,
-        message: "Resume not found",
-      });
     }
 
-    res.status(200).json({
-      success: true,
-      message: "Resume updated successfully",
-      data: updatedResume,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update resume",
-      error: error.message,
-    });
-  }
-});
+})
 
+router.get('/:userId', async (req, res) => {
 
-// ===============================
-// DELETE RESUME
-// DELETE /api/resume/:id
-// ===============================
-router.delete("/:id", async (req, res) => {
-  try {
-    const deletedResume = await Resume.findByIdAndDelete(req.params.id);
+    try {
 
-    if (!deletedResume) {
-      return res.status(404).json({
-        success: false,
-        message: "Resume not found",
-      });
+        const resumes = await Resume.find({
+            user: req.params.userId
+        }).sort({ createdAt: -1 })
+
+        res.json(resumes)
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: 'Failed To Fetch Resumes'
+        })
+
     }
 
-    res.status(200).json({
-      success: true,
-      message: "Resume deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete resume",
-      error: error.message,
-    });
-  }
-});
+})
+router.put('/update/:id', async (req, res) => {
 
-module.exports = router;
+    try {
+
+        const updatedResume = await Resume.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        )
+
+        res.json(updatedResume)
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: 'Resume Update Failed'
+        })
+
+    }
+
+})
+
+router.delete('/delete/:id', async (req, res) => {
+
+    try {
+
+        await Resume.findByIdAndDelete(req.params.id)
+
+        res.json({
+            message: 'Resume Deleted'
+        })
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: 'Delete Failed'
+        })
+
+    }
+
+})
+
+module.exports = router

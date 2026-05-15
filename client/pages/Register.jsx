@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import API from '../services/api'
 import toast from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+
+import { GoogleLogin } from '@react-oauth/google'
 
 function Register() {
 
@@ -14,12 +16,18 @@ function Register() {
   })
 
   const handleChange = (e) => {
+
     setForm({
       ...form,
       [e.target.name]: e.target.value
     })
+
   }
-const handleSubmit = async (e) => {
+
+  // NORMAL REGISTER
+
+  const handleSubmit = async (e) => {
+
     e.preventDefault()
 
     try {
@@ -31,28 +39,57 @@ const handleSubmit = async (e) => {
       navigate('/login')
 
     } catch (err) {
+
       toast.error('Registration Failed')
+
     }
+
   }
 
-   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500'>
+  // GOOGLE REGISTER
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+
+    try {
+
+      const res = await API.post('/auth/google', {
+        credential: credentialResponse.credential
+      })
+
+      localStorage.setItem('token', res.data.token)
+
+      toast.success('Google Signup Successful')
+
+      navigate('/dashboard')
+
+    } catch (err) {
+
+      toast.error('Google Signup Failed')
+
+    }
+
+  }
+
+  return (
+
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-500 px-6'>
 
       <form
         onSubmit={handleSubmit}
-        className='bg-white p-10 rounded-2xl w-[400px] shadow-xl'
+        className='bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md'
       >
 
-        <h1 className='text-3xl font-bold mb-8 text-center'>
-          Register
+        <h1 className='text-4xl font-bold text-center mb-8 text-gray-800'>
+          Create Account
         </h1>
 
         <input
           type='text'
           name='name'
-          placeholder='Name'
+          placeholder='Full Name'
           onChange={handleChange}
-          className='w-full p-3 border rounded-lg mb-5'
+          className='w-full border p-3 rounded-xl mb-5'
+          required
         />
 
         <input
@@ -60,7 +97,8 @@ const handleSubmit = async (e) => {
           name='email'
           placeholder='Email'
           onChange={handleChange}
-          className='w-full p-3 border rounded-lg mb-5'
+          className='w-full border p-3 rounded-xl mb-5'
+          required
         />
 
         <input
@@ -68,12 +106,39 @@ const handleSubmit = async (e) => {
           name='password'
           placeholder='Password'
           onChange={handleChange}
-          className='w-full p-3 border rounded-lg mb-5'
+          className='w-full border p-3 rounded-xl mb-5'
+          required
         />
 
-        <button className='w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700'>
+        <button className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition'>
           Register
         </button>
+
+        <div className='my-2 text-center text-gray-500'>
+          OR
+        </div>
+
+        <div className='flex justify-center'>
+                  <button className='w-full  text-white py-3 rounded-xl transition'>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error('Google Login Failed')}
+                  />
+                </button>
+        </div>
+
+        <p className='text-center mt-8 text-gray-600'>
+
+          Already have an account?
+
+          <Link
+            to='/login'
+            className='text-blue-600 font-semibold ml-2'
+          >
+            Login
+          </Link>
+
+        </p>
 
       </form>
 

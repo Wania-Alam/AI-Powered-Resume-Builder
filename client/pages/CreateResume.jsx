@@ -3,13 +3,20 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+
 import API from '../services/api'
+
+import ModernTemplate from '../componenets/templates/Moderntemplate'
+import MinimalTemplate from '../componenets/templates/MinimalTemplate'
+import ProfessionalTemplate from '../componenets/templates/ProfessionalTemplate'
 
 function CreateResume() {
 
   const resumeRef = useRef()
-
   const [loading, setLoading] = useState(false)
+
+  // Template should come from dashboard (or default)
+  const selectedTemplate = localStorage.getItem('template') || 'Professional'
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +33,9 @@ function CreateResume() {
     projects: ''
   })
 
+  // =========================
+  // INPUT HANDLER
+  // =========================
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -36,11 +46,9 @@ function CreateResume() {
   // =========================
   // AI SUMMARY GENERATION
   // =========================
-
   const generateSummary = async () => {
 
     try {
-
       setLoading(true)
 
       const res = await API.post('/ai/summary', {
@@ -55,27 +63,20 @@ function CreateResume() {
 
       toast.success('AI Summary Generated')
 
-    } catch (err) {
-
-      console.log(err)
-
+    } catch (error) {
+      console.log(error)
       toast.error('Failed To Generate Summary')
-
     } finally {
-
       setLoading(false)
-
     }
   }
 
   // =========================
   // DOWNLOAD PDF
   // =========================
-
   const downloadPDF = async () => {
 
     const input = resumeRef.current
-
     const canvas = await html2canvas(input)
 
     const imgData = canvas.toDataURL('image/png')
@@ -93,15 +94,11 @@ function CreateResume() {
   }
 
   return (
+
     <div className='min-h-screen bg-gray-100 p-6 lg:p-10'>
 
       {/* HEADER */}
-
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className='flex flex-col lg:flex-row justify-between items-center mb-10 gap-5'
-      >
+      <div className='flex justify-between items-center mb-8'>
 
         <div>
           <h1 className='text-4xl font-bold text-gray-800'>
@@ -109,283 +106,174 @@ function CreateResume() {
           </h1>
 
           <p className='text-gray-500 mt-2'>
-            Build professional AI-powered resumes
+            Template: {selectedTemplate}
           </p>
         </div>
 
         <button
           onClick={downloadPDF}
-          className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition'
+          className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl'
         >
           Download PDF
         </button>
 
-      </motion.div>
+      </div>
 
       {/* MAIN GRID */}
-
       <div className='grid lg:grid-cols-2 gap-10'>
 
-        {/* LEFT SIDE FORM */}
-
+        {/* =========================
+            LEFT SIDE FORM
+        ========================= */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
           className='bg-white p-8 rounded-3xl shadow-xl'
         >
 
-          <h2 className='text-2xl font-bold mb-8'>
+          <h2 className='text-2xl font-bold mb-6'>
             Resume Information
           </h2>
 
-          {/* PERSONAL INFO */}
+          {/* INPUT STYLE (YOUR ORIGINAL STYLE KEPT) */}
 
-          <div className='space-y-5'>
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='name'
+            placeholder='Full Name'
+            value={formData.name}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='name'
-              placeholder='Full Name'
-              value={formData.name}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='email'
+            placeholder='Email'
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-            <input
-              type='email'
-              name='email'
-              placeholder='Email Address'
-              value={formData.email}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='phone'
+            placeholder='Phone'
+            value={formData.phone}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='phone'
-              placeholder='Phone Number'
-              value={formData.phone}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='address'
+            placeholder='Address'
+            value={formData.address}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='address'
-              placeholder='Address'
-              value={formData.address}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='linkedin'
+            placeholder='LinkedIn'
+            value={formData.linkedin}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='linkedin'
-              placeholder='LinkedIn URL'
-              value={formData.linkedin}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='github'
+            placeholder='GitHub'
+            value={formData.github}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='github'
-              placeholder='GitHub URL'
-              value={formData.github}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          <input
+            className='w-full border p-3 rounded-xl mb-4'
+            name='jobTitle'
+            placeholder='Job Title'
+            value={formData.jobTitle}
+            onChange={handleChange}
+          />
 
-            <input
-              type='text'
-              name='jobTitle'
-              placeholder='Job Title'
-              value={formData.jobTitle}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500'
-            />
+          {/* SUMMARY */}
+          <div className='mb-4'>
 
-            {/* SKILLS */}
+            <div className='flex justify-between items-center mb-2'>
+              <h3 className='font-semibold'>Summary</h3>
 
-            <textarea
-              name='skills'
-              placeholder='Skills (React, Node.js, MongoDB)'
-              value={formData.skills}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 h-28'
-            />
-
-            {/* SUMMARY */}
-
-            <div>
-
-              <div className='flex justify-between items-center mb-3'>
-
-                <h3 className='text-lg font-semibold'>
-                  Professional Summary
-                </h3>
-
-                <button
-                  type='button'
-                  onClick={generateSummary}
-                  className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition'
-                >
-                  {loading ? 'Generating...' : 'Generate AI'}
-                </button>
-
-              </div>
-
-              <textarea
-                name='summary'
-                placeholder='Professional Summary'
-                value={formData.summary}
-                onChange={handleChange}
-                className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 h-40'
-              />
-
+              <button
+                onClick={generateSummary}
+                className='bg-blue-600 text-white px-3 py-1 rounded text-sm'
+              >
+                {loading ? 'Generating...' : 'AI'}
+              </button>
             </div>
 
-            {/* EDUCATION */}
-
             <textarea
-              name='education'
-              placeholder='Education'
-              value={formData.education}
+              className='w-full border p-3 rounded-xl'
+              name='summary'
+              placeholder='Summary'
+              value={formData.summary}
               onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 h-28'
             />
-
-            {/* EXPERIENCE */}
-
-            <textarea
-              name='experience'
-              placeholder='Experience'
-              value={formData.experience}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 h-40'
-            />
-
-            {/* PROJECTS */}
-
-            <textarea
-              name='projects'
-              placeholder='Projects'
-              value={formData.projects}
-              onChange={handleChange}
-              className='w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 h-32'
-            />
-
           </div>
+
+          <textarea
+            className='w-full border p-3 rounded-xl mb-4'
+            name='skills'
+            placeholder='Skills'
+            value={formData.skills}
+            onChange={handleChange}
+          />
+
+          <textarea
+            className='w-full border p-3 rounded-xl mb-4'
+            name='education'
+            placeholder='Education'
+            value={formData.education}
+            onChange={handleChange}
+          />
+
+          <textarea
+            className='w-full border p-3 rounded-xl mb-4'
+            name='experience'
+            placeholder='Experience'
+            value={formData.experience}
+            onChange={handleChange}
+          />
+
+          <textarea
+            className='w-full border p-3 rounded-xl'
+            name='projects'
+            placeholder='Projects'
+            value={formData.projects}
+            onChange={handleChange}
+          />
 
         </motion.div>
 
-        {/* RIGHT SIDE PREVIEW */}
-
+        {/* =========================
+            RIGHT SIDE PREVIEW
+        ========================= */}
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
+          initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
         >
 
           <div
             ref={resumeRef}
-            className='bg-white min-h-screen p-10 rounded-3xl shadow-2xl'
+            className='bg-white rounded-3xl shadow-2xl overflow-hidden'
           >
 
-            {/* HEADER */}
+            {selectedTemplate === 'Modern' && (
+              <ModernTemplate formData={formData} />
+            )}
 
-            <div className='border-b pb-6'>
+            {selectedTemplate === 'Minimal' && (
+              <MinimalTemplate formData={formData} />
+            )}
 
-              <h1 className='text-5xl font-bold text-gray-800'>
-                {formData.name || 'Your Name'}
-              </h1>
-
-              <p className='text-xl text-blue-600 mt-2'>
-                {formData.jobTitle || 'Job Title'}
-              </p>
-
-              <div className='mt-4 text-gray-600 space-y-1'>
-
-                <p>{formData.email}</p>
-                <p>{formData.phone}</p>
-                <p>{formData.address}</p>
-                <p>{formData.linkedin}</p>
-                <p>{formData.github}</p>
-
-              </div>
-
-            </div>
-
-            {/* SUMMARY */}
-
-            <div className='mt-8'>
-
-              <h2 className='text-2xl font-bold border-b pb-2'>
-                Professional Summary
-              </h2>
-
-              <p className='mt-4 text-gray-700 leading-7 whitespace-pre-line'>
-                {formData.summary}
-              </p>
-
-            </div>
-
-            {/* SKILLS */}
-
-            <div className='mt-8'>
-
-              <h2 className='text-2xl font-bold border-b pb-2'>
-                Skills
-              </h2>
-
-              <p className='mt-4 text-gray-700 whitespace-pre-line'>
-                {formData.skills}
-              </p>
-
-            </div>
-
-            {/* EDUCATION */}
-
-            <div className='mt-8'>
-
-              <h2 className='text-2xl font-bold border-b pb-2'>
-                Education
-              </h2>
-
-              <p className='mt-4 text-gray-700 whitespace-pre-line'>
-                {formData.education}
-              </p>
-
-            </div>
-
-            {/* EXPERIENCE */}
-
-            <div className='mt-8'>
-
-              <h2 className='text-2xl font-bold border-b pb-2'>
-                Experience
-              </h2>
-
-              <p className='mt-4 text-gray-700 whitespace-pre-line'>
-                {formData.experience}
-              </p>
-
-            </div>
-
-            {/* PROJECTS */}
-
-            <div className='mt-8'>
-
-              <h2 className='text-2xl font-bold border-b pb-2'>
-                Projects
-              </h2>
-
-              <p className='mt-4 text-gray-700 whitespace-pre-line'>
-                {formData.projects}
-              </p>
-
-            </div>
+            {selectedTemplate === 'Professional' && (
+              <ProfessionalTemplate formData={formData} />
+            )}
 
           </div>
 

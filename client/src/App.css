@@ -182,3 +182,38 @@
     border-right-color: var(--border);
   }
 }
+
+.input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  outline: none;
+  margin-bottom: 16px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  outline: none;
+  margin-bottom: 16px;
+  font-size: 15px;
+  min-height: 140px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}

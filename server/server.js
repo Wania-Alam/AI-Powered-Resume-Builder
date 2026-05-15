@@ -12,6 +12,8 @@ app.use(express.json())
 
 app.use('/api/auth', require('./routes/authRoutes'))
 app.use('/api/ai', require('./routes/aiRoutes'))
+app.use('/api/auth', require('./routes/googleAuthRoutes'))
+app.use('/api/resume', require('./routes/resumeRoutes'))
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB Connected'))

@@ -2,18 +2,20 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-async function generateSummary(jobTitle, skills) {
+async function generateSummary(jobTitle, skills, experience) {
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });
 
     const prompt = `
-      Generate a professional resume summary for a ${jobTitle}.
-      Skills: ${skills}
+        Generate a professional ATS-friendly resume summary.
 
-      Keep it concise, ATS-friendly, and professional.
-    `;
+        Job Title: ${jobTitle}
+        Skills: ${skills}
+        Experience: ${experience}
+
+        Make it concise and professional.`;
 
     const result = await model.generateContent(prompt);
 
