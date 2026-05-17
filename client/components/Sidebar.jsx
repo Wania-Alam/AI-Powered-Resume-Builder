@@ -15,13 +15,13 @@ function Sidebar({ activeTab, setActiveTab, user }) {
 
       <div className='flex items-center gap-3 border-b border-gray-700 pb-6'>
 
-        <div className='w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-2xl font-bold'>
+        <div className='w-12 h-12 rounded-2xl bg-blue-700 flex items-center justify-center text-2xl font-bold'>
           AI
         </div>
 
         <div>
-          <h1 className='text-2xl font-bold'>
-            ResumeAI
+          <h1 className='text-2xl font-bold '>
+            CV Forge
           </h1>
 
           <p className='text-gray-400 text-sm'>

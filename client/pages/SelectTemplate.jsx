@@ -1,113 +1,88 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
 
 function SelectTemplate() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const chooseTemplate = (template) => {
-    navigate("/create-resume", {
-      state: { template },
-    });
-  };
-
-  const templates = [
-    {
-      name: "Modern",
-
-      color: "from-blue-500 to-indigo-600",
-
-      description: "Best for developers, designers and modern tech careers.",
-
-      features: [
-        "Sidebar Design",
-        "Projects Section",
-        "Portfolio Links",
-        "Modern UI",
-      ],
-    },
-
-    {
-      name: "Minimal",
-
-      color: "from-gray-700 to-black",
-
-      description:
-        "ATS-friendly clean design for internships and fresh graduates.",
-
-      features: [
-        "Simple Layout",
-        "ATS Optimized",
-        "Clean Typography",
-        "Fast Reading",
-      ],
-    },
-
-    {
-      name: "Professional",
-
-      color: "from-emerald-600 to-teal-700",
-
-      description: "Corporate-style template for managers and professionals.",
-
-      features: [
-        "Elegant Header",
-        "Achievements",
-        "Certifications",
-        "Leadership",
-      ],
-    },
-  ];
+    localStorage.setItem('template', template)
+    navigate('/create-resume')
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
-      <h1 className="text-5xl font-bold text-center">Choose Resume Template</h1>
+    <div className='min-h-screen bg-gradient-to-r from-blue-700 to-cyan-500 text-white flex flex-col items-center justify-center p-10'>
+      
+      <h1 className='text-5xl font-bold text-center mb-12'>
+        Choose Template
+      </h1>
 
-      <div className="grid lg:grid-cols-3 gap-10 mt-16">
-        {templates.map((template) => (
-          <div
-            key={template.name}
-            onClick={() =>
-              navigate("/create-resume", {
-                state: {
-                  template: template.name,
-                },
-              })
-            }
-            className="bg-white rounded-3xl overflow-hidden shadow-xl hover:scale-105 transition duration-300 cursor-pointer"
-          >
-            {/* TOP PREVIEW */}
+      <div className='grid md:grid-cols-3 gap-10 w-full max-w-6xl'>
 
-            <div
-              className={`h-56 bg-gradient-to-r ${template.color} p-6 flex items-end`}
-            >
-              <h2 className="text-4xl font-bold text-white">{template.name}</h2>
-            </div>
-
-            {/* BODY */}
-
-            <div className="p-8">
-              <p className="text-gray-600 leading-7">{template.description}</p>
-
-              {/* FEATURES */}
-
-              <div className="mt-6 space-y-3">
-                {template.features.map((feature, index) => (
-                  <div key={index} className="bg-gray-100 rounded-xl p-3">
-                    {feature}
-                  </div>
-                ))}
-              </div>
-
-              {/* BUTTON */}
-
-              <button className="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl transition">
-                Use Template
-              </button>
-            </div>
+        {/* MINIMAL */}
+        <div className='bg-white p-5 rounded-3xl shadow-xl text-gray-800 flex flex-col justify-between '>
+          <div className='flex flex-col items-center w-full'>
+            <h2 className='text-3xl font-bold mb-4'>
+              Minimal
+            </h2>
+            <ul className='text-gray-500 space-y-2 list-none text-sm md:text-base'>
+              <li>• Clean, distraction-free layout</li>
+              <li>• Fully optimized for ATS scanners</li>
+              <li>• Perfect for tech & engineering roles</li>
+              <li>• Ideal choice for recent freshers</li>
+            </ul>
           </div>
-        ))}
+          <button
+            onClick={() => chooseTemplate('Minimal')}
+            className='mt-4 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors w-full md:w-auto'
+          >
+            Choose
+          </button>
+        </div>
+
+        {/* MODERN */}
+        <div className='bg-white p-5 rounded-3xl shadow-xl text-gray-800 flex flex-col justify-between'>
+          <div className='flex flex-col items-center w-full'>
+            <h2 className='text-3xl font-bold mb-4'>
+              Modern
+            </h2>
+            <ul className='text-gray-500 space-y-2 list-none text-sm md:text-base'>
+              <li>• Dynamic two-column arrangement</li>
+              <li>• Dedicated space for portfolio links</li>
+              <li>• Includes personal branding profile</li>
+              <li>• Tailored for creative & marketing roles</li>
+            </ul>
+          </div>
+          <button
+            onClick={() => chooseTemplate('Modern')}
+            className='mt-4 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors w-full md:w-auto'
+          >
+            Choose
+          </button>
+        </div>
+
+        {/* PROFESSIONAL */}
+        <div className='bg-white p-5 rounded-3xl shadow-xl text-gray-800 flex flex-col  justify-between '>
+          <div className='flex flex-col items-center w-full'>
+            <h2 className='text-3xl font-bold mb-4'>
+              Professional
+            </h2>
+            <ul className='text-gray-500 space-y-2 list-none text-sm md:text-base'>
+              <li>• Structured executive formatting</li>
+              <li>• Built for multi-page work histories</li>
+              <li>• Highlight certifications & awards</li>
+              <li>• Designed for corporate & senior positions</li>
+            </ul>
+          </div>
+          <button
+            onClick={() => chooseTemplate('Professional')}
+            className='mt-4 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors w-full md:w-auto'
+          >
+            Choose
+          </button>
+        </div>
+
       </div>
     </div>
-  );
+  )
 }
 
-export default SelectTemplate;
+export default SelectTemplate

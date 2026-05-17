@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import API from '../services/api'
 
 function ChatbotSection() {
@@ -6,39 +6,72 @@ function ChatbotSection() {
   const [message, setMessage] = useState('')
   const [chat, setChat] = useState([])
 
-  const sendMessage = async () => {
-
-    if (!message) return
-
-    const userMessage = {
-      role: 'user',
-      text: message
-    }
-
-    setChat(prev => [...prev, userMessage])
-
-    try {
-
-      const res = await API.post('/ai/chat', {
-        message
-      })
-
-      const botMessage = {
+  // 👉 BOT GREETING ON LOAD
+  useEffect(() => {
+    setChat([
+      {
         role: 'bot',
-        text: res.data.reply
+        text: "👋 What do you want to talk about today? (Career advice, resumes, interviews, jobs)"
       }
+    ])
+  }, [])
 
-      setChat(prev => [...prev, botMessage])
+  // 👉 SIMPLE TOPIC FILTER
+  const isCareerRelated = (text) => {
 
-    } catch (err) {
+    const allowedKeywords = [
+      'resume', 'job', 'career', 'interview',
+      'skills', 'cv', 'internship', 'salary',
+      'promotion', 'cover letter', 'hiring'
+    ]
 
-      console.log(err)
+    const lower = text.toLowerCase()
 
-    }
-
-    setMessage('')
+    return allowedKeywords.some(word => lower.includes(word))
   }
 
+  const sendMessage = async () => {
+
+  if (!message.trim()) return
+
+  const userMessage = {
+    role: 'user',
+    text: message
+  }
+
+  setChat(prev => [...prev, userMessage])
+
+  const currentMessage = message
+
+  setMessage('')
+
+  try {
+
+    const res = await API.post('/ai/chat', {
+      message: currentMessage
+    })
+
+    const botMessage = {
+      role: 'bot',
+      text: res.data.reply
+    }
+
+    setChat(prev => [...prev, botMessage])
+
+  } catch (err) {
+
+    console.log(err)
+
+    setChat(prev => [
+      ...prev,
+      {
+        role: 'bot',
+        text: err.response?.data?.reply || err.message
+        // text: 'Something went wrong with AI'
+      }
+    ])
+  }
+}
   return (
 
     <div className='h-[85vh] flex flex-col'>
@@ -52,20 +85,15 @@ function ChatbotSection() {
       </p>
 
       {/* CHAT AREA */}
-
       <div className='flex-1 bg-white rounded-3xl shadow-lg p-6 mt-8 overflow-y-auto'>
 
         {chat.map((msg, index) => (
-
           <div
             key={index}
             className={`mb-4 flex ${
-              msg.role === 'user'
-                ? 'justify-end'
-                : 'justify-start'
+              msg.role === 'user' ? 'justify-end' : 'justify-start'
             }`}
           >
-
             <div
               className={`max-w-[70%] p-4 rounded-2xl ${
                 msg.role === 'user'
@@ -73,19 +101,14 @@ function ChatbotSection() {
                   : 'bg-gray-200 text-gray-800'
               }`}
             >
-
               {msg.text}
-
             </div>
-
           </div>
-
         ))}
 
       </div>
 
       {/* INPUT */}
-
       <div className='flex gap-4 mt-6'>
 
         <input
@@ -106,7 +129,6 @@ function ChatbotSection() {
       </div>
 
     </div>
-
   )
 }
 

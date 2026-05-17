@@ -1,4 +1,4 @@
-import Navbar from '../componenets/Navbar'
+import Navbar from '../components/Navbar'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
@@ -39,12 +39,11 @@ function Home() {
             }}
             className='text-6xl font-bold leading-tight'
           >
-            Build AI-Powered Professional Resumes
+            Land Your Dream Job in Minutes
           </motion.h1>
 
           <p className='mt-6 text-xl text-gray-100'>
-            Create ATS-friendly resumes instantly using AI
-            and land your dream job faster.
+           Create a professional, HR-approved resume with our AI-powered builder. Pick a template, fill in the blanks, and download your future.
           </p>
 
           <Link to='/register'>
@@ -73,14 +72,17 @@ function Home() {
           <div>
 
             <h2 className='text-5xl font-bold text-gray-800'>
-              About Our Platform
-            </h2>
+              The Smartest Shortcut to Your Next Career Move.
+            </h2><h3 className='text-3xl  text-gray-800'>
+              Why 500,000+ job seekers skipped the word document and used us instead.
+            </h3>
 
             <p className='mt-6 text-gray-600 leading-8 text-lg'>
               Our AI Resume Builder helps students and professionals
               generate beautiful, ATS-friendly resumes with the power
               of artificial intelligence. Save time, improve your
               resume quality, and stand out from the competition.
+              
             </p>
 
             <button className='mt-8 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition'>
@@ -284,12 +286,12 @@ function Home() {
 
           <div>
 
-            <h2 className='text-3xl font-bold'>
-              AI Resume Builder
+            <h2 className='font-logo text-3xl font-bold'>
+              CV Forge
             </h2>
 
             <p className='mt-4 text-gray-400'>
-              Build modern resumes using AI-powered tools.
+              Create a professional, HR-approved resume with our AI-powered builder. Pick a template, fill in the blanks, and download your future.
             </p>
 
           </div>
@@ -316,8 +318,8 @@ function Home() {
             </h3>
 
             <p className='mt-4 text-gray-400'>
-              support@airesume.com
-            </p>
+              cvforgef@gmail.com
+              </p>
 
             <p className='text-gray-400'>
               +92 300 0000000
@@ -328,7 +330,7 @@ function Home() {
         </div>
 
         <div className='text-center text-gray-500 mt-10'>
-          © 2026 AI Resume Builder. All rights reserved.
+          © 2026 CV Forge. All rights reserved.
         </div>
 
       </footer>

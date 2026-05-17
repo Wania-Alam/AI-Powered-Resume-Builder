@@ -1,14 +1,20 @@
-const express = require('express')
-const { generateSummary } = require('../services/GeminiService')
+const express = require('express');
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/summary', async (req, res) => {
-    const { jobTitle, skills } = req.body
+const {
+  generateSummary,
+  chatWithAI
+} = require('../controllers/aiController');
 
-    const result = await generateSummary(jobTitle, skills)
+//
+// RESUME SUMMARY
+//
+router.post('/summary', generateSummary);
 
-    res.json({ summary: result })
-})
+//
+// CHATBOT
+//
+router.post('/chat', chatWithAI);
 
-module.exports = router
+module.exports = router;

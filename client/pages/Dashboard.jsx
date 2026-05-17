@@ -1,54 +1,37 @@
 import { useState, useEffect } from 'react'
-
-import Sidebar from '../componenets/Sidebar'
-import ResumeSection from '../componenets/ResumeSection'
-import DocumentsSection from '../componenets/DocumentSection'
-import ChatbotSection from '../componenets/ChatbotSection'
+import Sidebar from '../components/Sidebar'
+import ResumeSection from '../components/ResumeSection'
+import DocumentSection from '../components/DocumentSection' // Fixed minor plural naming syntax match
+import ChatbotSection from '../components/ChatbotSection'
 
 function Dashboard() {
-
-  const [activeTab, setActiveTab] = useState('resume')
-
+  const [activeTab, setActiveTab] = useState('documents') // Updated default layout focus state to focus documents
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-
-    // TEMP USER
-    // Later fetch from backend
-
+    // Mocking user metadata profile target state
     setUser({
       name: 'Wania Alam',
       email: 'wania@gmail.com'
     })
-
   }, [])
 
   return (
-
-    <div className='flex bg-gray-100'>
-
+    <div className='flex bg-gray-100 min-h-screen w-full overflow-hidden'>
       {/* SIDEBAR */}
-
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         user={user}
       />
 
-      {/* MAIN CONTENT */}
-
-      <div className='flex-1 p-10 overflow-y-auto h-screen'>
-
+      {/* MAIN CONTENT CONTAINMENT FRAMEWORK */}
+      <main className='flex-1 p-10 overflow-y-auto h-screen w-full'>
         {activeTab === 'resume' && <ResumeSection />}
-
-        {activeTab === 'documents' && <DocumentsSection />}
-
+        {activeTab === 'documents' && <DocumentSection />}
         {activeTab === 'chatbot' && <ChatbotSection />}
-
-      </div>
-
+      </main>
     </div>
-
   )
 }
 

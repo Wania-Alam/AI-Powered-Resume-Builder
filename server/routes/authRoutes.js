@@ -5,48 +5,78 @@ const User = require('../models/User')
 
 const router = express.Router()
 
+// REGISTER
 router.post('/register', async (req, res) => {
-    try {
-        const { name, email, password } = req.body
 
-        const hashed = await bcrypt.hash(password, 10)
+  try {
 
-        const user = await User.create({
-            name,
-            email,
-            password: hashed
-        })
+    const { name, email, password } = req.body
 
-        res.json(user)
-    } catch (err) {
-        res.status(500).json(err)
+    const existingUser = await User.findOne({ email })
+
+    if (existingUser) {
+      return res.status(400).json({
+        msg: 'User already exists'
+      })
     }
+
+    const hashed = await bcrypt.hash(password, 10)
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashed
+    })
+
+    res.json(user)
+
+  } catch (err) {
+    res.status(500).json(err)
+  }
 })
 
+
+// LOGIN
 router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body
 
-        const user = await User.findOne({ email })
+  try {
 
-        if (!user)
-            return res.status(400).json({ msg: 'User not found' })
+    const { email, password } = req.body
 
-        const match = await bcrypt.compare(password, user.password)
+    const user = await User.findOne({ email })
 
-        if (!match)
-            return res.status(400).json({ msg: 'Invalid password' })
-
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        )
-
-        res.json({ token, user })
-    } catch (err) {
-        res.status(500).json(err)
+    if (!user) {
+      return res.status(400).json({
+        msg: 'User not found'
+      })
     }
+
+    // BLOCK GOOGLE USERS
+    if (!user.password) {
+      return res.status(400).json({
+        msg: 'Please login with Google'
+      })
+    }
+
+    const match = await bcrypt.compare(password, user.password)
+
+    if (!match) {
+      return res.status(400).json({
+        msg: 'Invalid password'
+      })
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    res.json({ token, user })
+
+  } catch (err) {
+    res.status(500).json(err)
+  }
 })
 
 module.exports = router

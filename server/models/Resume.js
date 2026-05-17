@@ -2,34 +2,36 @@ const mongoose = require('mongoose')
 
 const resumeSchema = new mongoose.Schema({
 
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
 
-    title: String,
+  name: String,
+  email: String,
+  phone: String,
+  address: String,
 
-    template: String,
+  linkedin: String,
+  github: String,
 
-    personalInfo: Object,
+  jobTitle: String,
+  summary: String,
 
-    summary: String,
+  skills: String,
+  education: String,
+  experience: String,
 
-    skills: [String],
+  projects: String,
+  certifications: String,
+  achievements: String,
+  languages: String,
 
-    education: [Object],
+  template: String
 
-    experience: [Object],
-
-    projects: [Object],
-
-    atsScore: Number,
-
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-
+}, {
+  timestamps: true
 })
 
-module.exports = mongoose.model('Resume', resumeSchema)
+module.exports =
+  mongoose.model('Resume', resumeSchema)

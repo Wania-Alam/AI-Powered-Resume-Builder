@@ -5,7 +5,9 @@ import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import CreateResume from "../pages/CreateResume";
 import { Toaster } from "react-hot-toast";
-import SelectTemplate from '../pages/SelectTemplate'
+import SelectTemplate from "../pages/SelectTemplate";
+import CreateDocument from "../pages/CreateDocument"; 
+import SelectDocumentTemplate from "../pages/SelectDocument";
 
 function App() {
   return (
@@ -20,8 +22,16 @@ function App() {
         <Route path="/select-template" element={<SelectTemplate />} />
 
         <Route path="/create-resume" element={<CreateResume />} />
+        <Route path="/create-resume/:id" element={<CreateResume />} />
 
         <Route path="/edit-resume/:id" element={<CreateResume />} />
+        <Route
+  path='/select-document-template'
+  element={<SelectDocumentTemplate />}
+/>
+        <Route path="/create-document" element={<CreateDocument />} />
+
+        <Route path="/create-document/edit/:id" element={<CreateDocument />} />
       </Routes>
     </BrowserRouter>
   );

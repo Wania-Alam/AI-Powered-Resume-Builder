@@ -51,25 +51,22 @@ function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
 
-    try {
+  try {
 
-      const res = await API.post('/auth/google', {
-        credential: credentialResponse.credential
-      })
+    const res = await API.post('/auth/google', {
+      credential: credentialResponse.credential
+    })
 
-      localStorage.setItem('token', res.data.token)
+    localStorage.setItem('token', res.data.token)
 
-      toast.success('Google Login Successful')
+    toast.success('Login Successful')
 
-      navigate('/dashboard')
+    navigate('/dashboard')
 
-    } catch (err) {
-
-      toast.error('Google Login Failed')
-
-    }
-
+  } catch (err) {
+    toast.error('Google Login Failed')
   }
+}
 
   return (
 
@@ -117,9 +114,11 @@ function Login() {
         <div className='flex justify-center'>
           <button className='w-full  text-white py-3 rounded-xl transition'>
           <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => toast.error('Google Login Failed')}
-          />
+  onSuccess={handleGoogleSuccess}
+  onError={() =>
+    toast.error('Google Login Failed')
+  }
+/>
         </button>         
         </div>
 

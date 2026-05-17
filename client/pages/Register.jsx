@@ -50,25 +50,22 @@ function Register() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
 
-    try {
+  try {
 
-      const res = await API.post('/auth/google', {
-        credential: credentialResponse.credential
-      })
+    const res = await API.post('/auth/google', {
+      credential: credentialResponse.credential
+    })
 
-      localStorage.setItem('token', res.data.token)
+    localStorage.setItem('token', res.data.token)
 
-      toast.success('Google Signup Successful')
+    toast.success('Signup Successful')
 
-      navigate('/dashboard')
+    navigate('/dashboard')
 
-    } catch (err) {
-
-      toast.error('Google Signup Failed')
-
-    }
-
+  } catch (err) {
+    toast.error('Google Signup Failed')
   }
+}
 
   return (
 

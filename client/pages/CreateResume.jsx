@@ -1,22 +1,28 @@
-import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useEffect} from 'react'
 import toast from 'react-hot-toast'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import API from '../services/api'
 
-import ModernTemplate from '../componenets/templates/Moderntemplate'
-import MinimalTemplate from '../componenets/templates/MinimalTemplate'
-import ProfessionalTemplate from '../componenets/templates/ProfessionalTemplate'
+import MinimalForm from '../components/forms/MinimalForm'
+import ModernForm from '../components/forms/ModernForm'
+import ProfessionalForm from '../components/forms/ProfessionalForm'
+
+import MinimalTemplate from '../components/templates/MinimalTemplate'
+import ModernTemplate from '../components/templates/ModernTemplate'
+import ProfessionalTemplate from '../components/templates/ProfessionalTemplate'
 
 function CreateResume() {
 
+  const { id } = useParams()   // ✅ FIXED (inside component)
+  const navigate = useNavigate() // ✅ FIXED
+
+  const selectedTemplate = localStorage.getItem('template')
+
   const resumeRef = useRef()
   const [loading, setLoading] = useState(false)
-
-  // Template should come from dashboard (or default)
-  const selectedTemplate = localStorage.getItem('template') || 'Professional'
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,24 +36,16 @@ function CreateResume() {
     skills: '',
     education: '',
     experience: '',
-    projects: ''
+    projects: '',
+    certifications: '',
+    achievements: '',
+    languages: ''
   })
 
   // =========================
-  // INPUT HANDLER
-  // =========================
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  // =========================
-  // AI SUMMARY GENERATION
+  // AI SUMMARY
   // =========================
   const generateSummary = async () => {
-
     try {
       setLoading(true)
 
@@ -56,10 +54,10 @@ function CreateResume() {
         skills: formData.skills
       })
 
-      setFormData({
-        ...formData,
+      setFormData(prev => ({
+        ...prev,
         summary: res.data.summary
-      })
+      }))
 
       toast.success('AI Summary Generated')
 
@@ -72,29 +70,209 @@ function CreateResume() {
   }
 
   // =========================
-  // DOWNLOAD PDF
+// LOAD EXISTING RESUME
+// =========================
+
+useEffect(() => {
+
+  const fetchResume = async () => {
+
+    try {
+
+      if (!id) return
+
+      const token = localStorage.getItem('token')
+
+      const res = await API.get(
+        `/resume/single/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      setFormData(res.data)
+
+    } catch (err) {
+
+      console.log(err)
+
+    }
+  }
+
+  fetchResume()
+
+}, [id])
+
+// =========================
+// AUTO SAVE DRAFT
+// =========================
+
+useEffect(() => {
+
+  localStorage.setItem(
+    'resumeDraft',
+    JSON.stringify(formData)
+  )
+
+}, [formData])
+
+// =========================
+// RESTORE DRAFT
+// =========================
+
+useEffect(() => {
+
+  if (id) return
+
+  const draft =
+    localStorage.getItem('resumeDraft')
+
+  if (draft) {
+
+    setFormData(JSON.parse(draft))
+
+  }
+
+}, [])
   // =========================
-  const downloadPDF = async () => {
+  // SAVE RESUME
+  // =========================
+  const saveResume = async () => {
+    try {
 
-    const input = resumeRef.current
-    const canvas = await html2canvas(input)
+      const token = localStorage.getItem('token')
 
-    const imgData = canvas.toDataURL('image/png')
+      if (!token) {
+        return toast.error('Please login first')
+      }
+
+      const payload = {
+        ...formData,
+        template: selectedTemplate
+      }
+
+      if (id) {
+        await API.put(`/resume/update/${id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        toast.success('Resume Updated')
+      } else {
+        await API.post('/resume/create', payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        toast.success('Resume Saved')
+      }
+
+      navigate('/dashboard')
+
+    } catch (err) {
+      console.log(err)
+      toast.error('Failed to save resume')
+    }
+  }
+
+  // =========================
+  // PDF DOWNLOAD
+  // =========================
+  // =========================
+// PDF DOWNLOAD
+// =========================
+const downloadPDF = async () => {
+
+  try {
+
+    const element = document.getElementById('resume-preview')
+
+    if (!element) {
+      return toast.error('Resume not found')
+    }
+
+    toast.loading('Preparing PDF...', {
+      id: 'pdf'
+    })
+
+    // clone node
+    const clonedElement = element.cloneNode(true)
+
+    // hidden container
+    const container = document.createElement('div')
+
+    container.style.position = 'fixed'
+    container.style.top = '-9999px'
+    container.style.left = '-9999px'
+    container.style.width = '800px'
+    container.style.background = '#ffffff'
+    container.style.padding = '20px'
+
+    container.appendChild(clonedElement)
+
+    document.body.appendChild(container)
+
+    // FORCE SAFE COLORS
+    const allElements =
+      container.querySelectorAll('*')
+
+    allElements.forEach((el) => {
+
+      el.style.color = '#000000'
+
+      if (
+        window.getComputedStyle(el)
+          .backgroundColor !== 'rgba(0, 0, 0, 0)'
+      ) {
+        el.style.backgroundColor = '#ffffff'
+      }
+
+      el.style.borderColor = '#d1d5db'
+    })
+
+    const canvas = await html2canvas(clonedElement, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    })
+
+    document.body.removeChild(container)
+
+    const imgData =
+      canvas.toDataURL('image/png')
 
     const pdf = new jsPDF('p', 'mm', 'a4')
 
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+    const pdfWidth = 210
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+    const pdfHeight =
+      (canvas.height * pdfWidth) /
+      canvas.width
+
+    pdf.addImage(
+      imgData,
+      'PNG',
+      0,
+      0,
+      pdfWidth,
+      pdfHeight
+    )
 
     pdf.save('resume.pdf')
 
-    toast.success('Resume Downloaded')
+    toast.success('PDF Downloaded', {
+      id: 'pdf'
+    })
+
+  } catch (err) {
+
+    console.log(err)
+
+    toast.error('PDF download failed', {
+      id: 'pdf'
+    })
   }
+}
 
   return (
-
     <div className='min-h-screen bg-gray-100 p-6 lg:p-10'>
 
       {/* HEADER */}
@@ -110,165 +288,68 @@ function CreateResume() {
           </p>
         </div>
 
-        <button
-          onClick={downloadPDF}
-          className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl'
-        >
-          Download PDF
-        </button>
+        <div className='flex gap-4'>
 
+          <button
+            onClick={saveResume}
+            className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl'
+          >
+            Save Resume
+          </button>
+
+          <button
+            onClick={downloadPDF}
+            className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl'
+          >
+            Download PDF
+          </button>
+
+        </div>
       </div>
 
       {/* MAIN GRID */}
       <div className='grid lg:grid-cols-2 gap-10'>
 
-        {/* =========================
-            LEFT SIDE FORM
-        ========================= */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          className='bg-white p-8 rounded-3xl shadow-xl'
-        >
+        {/* FORM */}
+        <div className='bg-white p-8 rounded-3xl shadow-xl'>
 
-          <h2 className='text-2xl font-bold mb-6'>
-            Resume Information
-          </h2>
-
-          {/* INPUT STYLE (YOUR ORIGINAL STYLE KEPT) */}
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='name'
-            placeholder='Full Name'
-            value={formData.name}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='email'
-            placeholder='Email'
-            value={formData.email}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='phone'
-            placeholder='Phone'
-            value={formData.phone}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='address'
-            placeholder='Address'
-            value={formData.address}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='linkedin'
-            placeholder='LinkedIn'
-            value={formData.linkedin}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='github'
-            placeholder='GitHub'
-            value={formData.github}
-            onChange={handleChange}
-          />
-
-          <input
-            className='w-full border p-3 rounded-xl mb-4'
-            name='jobTitle'
-            placeholder='Job Title'
-            value={formData.jobTitle}
-            onChange={handleChange}
-          />
-
-          {/* SUMMARY */}
-          <div className='mb-4'>
-
-            <div className='flex justify-between items-center mb-2'>
-              <h3 className='font-semibold'>Summary</h3>
-
-              <button
-                onClick={generateSummary}
-                className='bg-blue-600 text-white px-3 py-1 rounded text-sm'
-              >
-                {loading ? 'Generating...' : 'AI'}
-              </button>
-            </div>
-
-            <textarea
-              className='w-full border p-3 rounded-xl'
-              name='summary'
-              placeholder='Summary'
-              value={formData.summary}
-              onChange={handleChange}
-            />
+          <div className='flex justify-end mb-6'>
+            <button
+              onClick={generateSummary}
+              className='bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl'
+            >
+              {loading ? 'Generating...' : 'Generate AI Summary'}
+            </button>
           </div>
 
-          <textarea
-            className='w-full border p-3 rounded-xl mb-4'
-            name='skills'
-            placeholder='Skills'
-            value={formData.skills}
-            onChange={handleChange}
-          />
+          {selectedTemplate === 'Minimal' && (
+            <MinimalForm formData={formData} setFormData={setFormData} />
+          )}
 
-          <textarea
-            className='w-full border p-3 rounded-xl mb-4'
-            name='education'
-            placeholder='Education'
-            value={formData.education}
-            onChange={handleChange}
-          />
+          {selectedTemplate === 'Modern' && (
+            <ModernForm formData={formData} setFormData={setFormData} />
+          )}
 
-          <textarea
-            className='w-full border p-3 rounded-xl mb-4'
-            name='experience'
-            placeholder='Experience'
-            value={formData.experience}
-            onChange={handleChange}
-          />
+          {selectedTemplate === 'Professional' && (
+            <ProfessionalForm formData={formData} setFormData={setFormData} />
+          )}
 
-          <textarea
-            className='w-full border p-3 rounded-xl'
-            name='projects'
-            placeholder='Projects'
-            value={formData.projects}
-            onChange={handleChange}
-          />
+        </div>
 
-        </motion.div>
-
-        {/* =========================
-            RIGHT SIDE PREVIEW
-        ========================= */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-
+        {/* PREVIEW */}
+        <div>
           <div
             ref={resumeRef}
-            className='bg-white rounded-3xl shadow-2xl overflow-hidden'
+            id='resume-preview'
+            className='bg-white p-8 rounded-3xl shadow-2xl'
           >
-
-            {selectedTemplate === 'Modern' && (
-              <ModernTemplate formData={formData} />
-            )}
 
             {selectedTemplate === 'Minimal' && (
               <MinimalTemplate formData={formData} />
+            )}
+
+            {selectedTemplate === 'Modern' && (
+              <ModernTemplate formData={formData} />
             )}
 
             {selectedTemplate === 'Professional' && (
@@ -276,8 +357,7 @@ function CreateResume() {
             )}
 
           </div>
-
-        </motion.div>
+        </div>
 
       </div>
 
