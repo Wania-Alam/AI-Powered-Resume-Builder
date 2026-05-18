@@ -1,32 +1,39 @@
 const mongoose = require('mongoose')
 
-const documentSchema = new mongoose.Schema({
+const documentSchema =
+  new mongoose.Schema({
 
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
 
-  type: {
+    title: String,
+
     type: String,
-    required: true
-  },
 
-  title: {
-    type: String,
-    required: true
-  },
+    fullName: String,
 
-  content: {
-    type: Object,
-    required: true
-  }
+    company: String,
 
-}, {
-  timestamps: true
-})
+    position: String,
 
-module.exports = mongoose.model(
-  'Document',
-  documentSchema
-)
+    recipient: String,
+
+    sender: String,
+
+    skills: String,
+
+    experience: String,
+
+    content: String
+
+  }, {
+    timestamps: true
+  })
+
+module.exports =
+  mongoose.model(
+    'Document',
+    documentSchema
+  )

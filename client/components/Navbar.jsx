@@ -16,6 +16,16 @@ function Navbar() {
         <Link to='/' className='hover:text-blue-600 transition-colors duration-200'>
           Home
         </Link>
+        <Link
+  to='/about'
+  className='hover:text-blue-600 transition-colors duration-200'
+>
+  About
+</Link>
+<Link to='/contact'
+  className='hover:text-blue-600 transition-colors duration-200'
+>
+  Contact</Link>
         <Link to='/login' className='hover:text-blue-600 transition-colors duration-200'>
           Login
         </Link>

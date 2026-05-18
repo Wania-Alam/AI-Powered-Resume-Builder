@@ -8,6 +8,8 @@ import { Toaster } from "react-hot-toast";
 import SelectTemplate from "../pages/SelectTemplate";
 import CreateDocument from "../pages/CreateDocument"; 
 import SelectDocumentTemplate from "../pages/SelectDocument";
+import About from '../pages/About'
+import Contact from '../pages/Contact'
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/contact' element={<Contact />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/select-template" element={<SelectTemplate />} />
 
@@ -31,7 +35,7 @@ function App() {
 />
         <Route path="/create-document" element={<CreateDocument />} />
 
-        <Route path="/create-document/edit/:id" element={<CreateDocument />} />
+        <Route path="/create-document/:id" element={<CreateDocument />} />
       </Routes>
     </BrowserRouter>
   );

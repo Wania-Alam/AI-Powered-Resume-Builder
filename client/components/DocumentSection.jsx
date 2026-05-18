@@ -1,76 +1,128 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import API from '../services/api'
-import DocumentCard from './DocumentCard'
 import toast from 'react-hot-toast'
 
+import API from '../services/api'
+import DocumentCard from './DocumentCard'
+
 function DocumentSection() {
+
   const navigate = useNavigate()
+
   const [documents, setDocuments] = useState([])
-  const [loading, setLoading] = useState(true)
+
+  // =========================
+  // FETCH DOCUMENTS
+  // =========================
 
   useEffect(() => {
+
     fetchDocuments()
+
   }, [])
 
   const fetchDocuments = async () => {
+
     try {
-      setLoading(true)
+
       const token = localStorage.getItem('token')
-      const res = await API.get('/document/my-documents', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      setDocuments(res.data || [])
+
+      const res = await API.get(
+        '/document/my-documents',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      setDocuments(res.data)
+
     } catch (err) {
-      console.error(err)
-      toast.error('Could not load your saved documents')
-    } finally {
-      setLoading(false)
+
+      console.log(err)
+      toast.error('Failed to fetch documents')
+
     }
   }
 
+  // =========================
+  // DELETE FROM UI
+  // =========================
+
+  const handleDelete = (id) => {
+
+    setDocuments(prev =>
+      prev.filter(doc => doc._id !== id)
+    )
+
+  }
+
   return (
-    <div className='w-full'>
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10'>
+
+    <div className='p-8'>
+
+      {/* HEADER */}
+
+      <div className='flex justify-between items-center mb-10'>
+
         <div>
-          <h1 className='text-4xl font-bold text-gray-900'>My Documents</h1>
-          <p className='text-gray-500 mt-1'>Manage your Documents</p>
+
+          <h1 className='text-4xl font-bold'>
+            My Documents
+          </h1>
+
+          <p className='text-gray-500 mt-2'>
+            Manage your professional documents
+          </p>
+
         </div>
+
         <button
-          onClick={() => navigate('/create-document')}
-          className='bg-[#0F172A] text-white px-6 py-3 rounded-xl'
+          onClick={() =>
+            navigate('/select-document-template')
+          }
+          className='bg-[#0F172A] hover:bg-blue-700 text-white px-6 py-3 rounded-xl'
         >
-          + Create New
+          Create Document
         </button>
+
       </div>
 
-      {loading ? (
-        <div className='flex justify-center items-center h-64'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
-        </div>
-      ) : documents.length === 0 ? (
-        <div className='bg-white rounded-3xl p-12 text-center shadow-lg border border-gray-100 max-w-lg mx-auto mt-12 flex flex-col items-center'>
-          <div className='bg-blue-50 text-blue-600 p-4 rounded-2xl mb-4 text-2xl font-bold w-14 h-14 flex items-center justify-center'>
-            📄
-          </div>
-          <h3 className='text-xl font-bold text-gray-800 mb-2'>No Saved Documents Found</h3>
-          <p className='text-gray-500 text-sm mb-6 max-w-sm leading-relaxed'>
-            You haven't generated or saved any official communications yet. Use our structured templates to export professional standard PDFs.
+      {/* EMPTY STATE */}
+
+      {documents.length === 0 ? (
+
+        <div className='bg-white p-20 rounded-3xl shadow text-center'>
+
+          <h2 className='text-2xl font-bold mb-4'>
+            No Documents Found
+          </h2>
+
+          <p className='text-gray-500'>
+            Create your first professional document
           </p>
-          <button
-            onClick={() => navigate('/create-document')}
-            className='bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition shadow-md'
-          >
-            Create Your First Document
-          </button>
+
         </div>
+
       ) : (
-        <div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {documents.map((doc) => (
-            <DocumentCard key={doc._id} document={doc} />
+
+        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+
+          {documents.map((document) => (
+
+            <DocumentCard
+              key={document._id}
+              document={document}
+              onDelete={handleDelete}
+            />
+
           ))}
+
         </div>
+
       )}
+
     </div>
   )
 }

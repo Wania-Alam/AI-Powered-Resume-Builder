@@ -2,10 +2,74 @@ import {
   FaFileAlt,
   FaRobot,
   FaUserCircle,
-  FaFolderOpen
+  FaFolderOpen,
+  FaSignOutAlt
 } from 'react-icons/fa'
 
-function Sidebar({ activeTab, setActiveTab, user }) {
+import { useEffect, useState } from 'react'
+
+import { useNavigate } from 'react-router-dom'
+
+import toast from 'react-hot-toast'
+
+import API from '../services/api'
+
+function Sidebar({ activeTab, setActiveTab }) {
+
+  const navigate = useNavigate()
+
+  const [user, setUser] = useState(null)
+
+  // =========================
+  // FETCH USER
+  // =========================
+
+  useEffect(() => {
+
+    const fetchUser = async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem('token')
+
+        if (!token) return
+
+        const res = await API.get(
+          '/user/me',
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        )
+
+        setUser(res.data)
+
+      } catch (err) {
+
+        console.log(err)
+
+      }
+    }
+
+    fetchUser()
+
+  }, [])
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  const logout = () => {
+
+    localStorage.removeItem('token')
+
+    toast.success('Logged Out')
+
+    navigate('/')
+  }
 
   return (
 
@@ -20,13 +84,15 @@ function Sidebar({ activeTab, setActiveTab, user }) {
         </div>
 
         <div>
-          <h1 className='text-2xl font-bold '>
+
+          <h1 className='text-2xl font-bold'>
             CV Forge
           </h1>
 
           <p className='text-gray-400 text-sm'>
             Career Assistant
           </p>
+
         </div>
 
       </div>
@@ -40,11 +106,11 @@ function Sidebar({ activeTab, setActiveTab, user }) {
         <div>
 
           <h2 className='font-semibold text-lg'>
-            {user?.name || 'User'}
+            {user?.name || 'Loading...'}
           </h2>
 
           <p className='text-gray-400 text-sm'>
-            {user?.email || 'user@email.com'}
+            {user?.email || 'Loading...'}
           </p>
 
         </div>
@@ -108,11 +174,24 @@ function Sidebar({ activeTab, setActiveTab, user }) {
 
       </div>
 
+      {/* LOGOUT BUTTON */}
+
+      <button
+        onClick={logout}
+        className='mt-8 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 transition-all duration-300 p-4 rounded-2xl'
+      >
+
+        <FaSignOutAlt />
+
+        Logout
+
+      </button>
+
       {/* FOOTER */}
 
       <div className='mt-auto text-center text-gray-500 text-sm pt-10'>
 
-        AI Resume Builder © 2026
+        CV Forge © 2026
 
       </div>
 

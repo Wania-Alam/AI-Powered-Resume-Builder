@@ -5,6 +5,10 @@ const dotenv = require('dotenv')
 const aiRoutes = require('./routes/aiRoutes')
 const resumeRoutes =require('./routes/resumeRoutes')
 const documentRoutes = require('./routes/documentRoutes')
+const userRoutes = require('./routes/userRoutes')
+const contactRoutes =
+  require('./routes/contactRoutes')
+
 
 dotenv.config()
 
@@ -20,7 +24,8 @@ app.use('/api/auth', require('./routes/googleAuthRoutes'))
 app.use('/api/resume', require('./routes/resumeRoutes'))
 app.use('/api/resume', resumeRoutes)
 app.use('/api/document', documentRoutes)
-
+app.use('/api/user', userRoutes)
+app.use('/api/contact', contactRoutes)
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB Connected'))
